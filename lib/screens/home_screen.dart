@@ -26,6 +26,7 @@ String customGreeting() {
 
 class _HomeScreenState extends State<HomeScreen> {
   late List<NoteModel> notes;
+  late NoteModel snote;
   bool isLoading = false;
 
   @override
@@ -44,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future refreshNotes() async {
     setState(() => isLoading = true);
-    this.notes = await SecureNotesDB.instance.readAllNotes();
+    notes = await SecureNotesDB.instance.readAllNotes();
+    //snote = await SecureNotesDB.instance.readNote();
     setState(() => isLoading = false);
   }
 
@@ -110,47 +112,54 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: TabBarView(children: [
                 Column(
                   children: [
-                    Expanded(
-                        child: isLoading
-                            ? CircularProgressIndicator()
-                            : notes.isEmpty
-                                ? Text(
-                                    'You do not have any notes yet',
-                                    style: TextStyle(fontSize: 24),
-                                  )
-                                : StaggeredGridView.countBuilder(
-                                    padding: EdgeInsets.all(8),
-                                    itemCount: notes.length,
-                                    staggeredTileBuilder: (index) =>
-                                        StaggeredTile.fit(2),
-                                    crossAxisCount: 4,
-                                    mainAxisSpacing: 4,
-                                    crossAxisSpacing: 4,
-                                    itemBuilder: (context, index) {
-                                      final note = notes[index];
-                                      return GestureDetector(
-                                        onTap: () async {
-                                          await Navigator.of(context)
-                                              .push(MaterialPageRoute(
-                                            builder: (context) => AddNote(
-                                              noteId: note.id!,
-                                              note: note,
-                                            ),
-                                          ));
-                                          refreshNotes();
-                                        },
-                                        child: NoteCardWidget(
-                                          note: note,
-                                          index: index,
-                                        ),
-                                      );
-                                    },
-                                  )),
+                    isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : notes.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'You do not have any notes yet',
+                                ),
+                              )
+                            : Expanded(
+                                child: StaggeredGridView.countBuilder(
+                                  padding: EdgeInsets.all(8),
+                                  itemCount: notes.length,
+                                  staggeredTileBuilder: (index) =>
+                                      StaggeredTile.fit(2),
+                                  crossAxisCount: 4,
+                                  mainAxisSpacing: 4,
+                                  crossAxisSpacing: 4,
+                                  itemBuilder: (context, index) {
+                                    final note = notes[index];
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        await Navigator.of(context)
+                                            .push(MaterialPageRoute(
+                                          builder: (context) => AddNote(
+                                            noteId: notes[index].id,
+                                            note: note,
+                                          ),
+                                        ));
+                                        refreshNotes();
+                                      },
+                                      child: NoteCardWidget(
+                                        note: note,
+                                        index: index,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
                     Expanded(
                       child: Align(
                         alignment: Alignment.bottomRight,
                         child: FloatingActionButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) => AddNote()),
+                            );
+                          },
                           child: Icon(Icons.note_add_outlined),
                         ),
                       ),

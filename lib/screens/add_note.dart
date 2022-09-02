@@ -5,157 +5,104 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:secure_notes/db/database_provider.dart';
 import 'package:secure_notes/model/note_model.dart';
+import 'package:secure_notes/widgets/note_form_widget.dart';
 
 class AddNote extends StatefulWidget {
-  final int noteId;
+  final int? noteId;
   final NoteModel? note;
   const AddNote({
     Key? key,
-    required this.noteId,
+    this.noteId,
     this.note,
   }) : super(key: key);
   @override
   State<AddNote> createState() => _AddNoteState();
-  Route<dynamic> newnoteroute() {
+  /*static Route<dynamic> newnoteroute() {
     return CupertinoPageRoute(builder: (BuildContext context) {
-      return AddNote(noteId: noteId);
-    });
-  }
+      return AddNote(
+        noteId: 1,
+      );
+    }); 
+  } */
 }
 
 class _AddNoteState extends State<AddNote> {
   final _formKey = GlobalKey<FormState>();
-  late NoteModel note;
-  late String title;
-  late String body;
-  late String lastEdited;
+  NoteModel? note;
+  String? title;
+  String? body;
   var dateTime = DateFormat.yMMMMEEEEd().add_jm().format(DateTime.now());
   bool isLoading = false;
+
+  Future refreshNotes() async {
+    setState(() => isLoading = true);
+    if (widget.noteId != null) {
+      note = await SecureNotesDB.instance.readNote(widget.noteId!);
+    }
+    setState(() => isLoading = false);
+  }
 
   @override
   void initState() {
     super.initState();
 
+    title = note?.title ?? '';
+    if (widget.noteId == null) {
+      body = '';
+    } else {
+      body = note?.body;
+    }
     refreshNotes();
-  }
-
-  Future refreshNotes() async {
-    setState(() => isLoading = true);
-    note = await SecureNotesDB.instance.readNote(widget.noteId);
-    setState(() => isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(20, 60, 20, 20),
-          child: Column(
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.05,
-                child: Row(
+      body: isLoading
+          ? Center(
+              child: Text('Hi'),
+            )
+          : Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+                child: Column(
                   children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: CupertinoButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.blue,
-                          )),
-                    ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Notes',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.blue),
-                      ),
-                    ),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: CupertinoButton(
-                            onPressed: () {},
+                    Row(
+                      children: [
+                        CupertinoButton(
+                            alignment: Alignment.centerLeft,
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
                             child: Icon(
-                              Icons.ios_share_outlined,
+                              Icons.arrow_back_ios,
                               color: Colors.blue,
-                            ),
-                          ),
+                            )),
+                        Text('Notes',
+                            style: TextStyle(fontSize: 18, color: Colors.blue)),
+                        Expanded(
+                          child: CupertinoButton(
+                              alignment: Alignment.centerRight,
+                              child: Icon(Icons.ios_share_outlined,
+                                  color: Colors.blue),
+                              onPressed: () {}),
                         ),
-                      ),
+                        CupertinoButton(
+                          child: Text('Done'),
+                          onPressed: addorUpdateNote,
+                        )
+                      ],
                     ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: CupertinoButton(
-                        onPressed: addorUpdateNote,
-                        child: Text(
-                          'Done',
-                          style: TextStyle(fontSize: 18, color: Colors.blue),
-                        ),
-                      ),
-                    )
+                    NoteFormWidget(
+                        onChangedTitle: (title) =>
+                            setState(() => this.title = title),
+                        onChangedBody: (body) =>
+                            setState(() => this.body = body)),
                   ],
                 ),
               ),
-              SizedBox(height: 30),
-              CupertinoTextField.borderless(
-                controller: TextEditingController(text: note.title),
-                onChanged: (value) {
-                  TextEditingController().text += note.title;
-                },
-                autofocus: true,
-                autocorrect: true,
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w800,
-                ),
-                placeholder: 'Title',
-                placeholderStyle: TextStyle(fontSize: 32, color: Colors.grey),
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                  child: Text(
-                    dateTime,
-                    textAlign: TextAlign.left,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: CupertinoTextField.borderless(
-                  controller: TextEditingController(text: note.body),
-                  onChanged: (value) {
-                    TextEditingController().text += note.body;
-                  },
-                  scribbleEnabled: true,
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                  placeholder: 'Enter text here',
-                  placeholderStyle: TextStyle(color: Colors.grey, fontSize: 18),
-                  maxLines: null,
-                  autocorrect: true,
-                  enableInteractiveSelection: true,
-                  textInputAction: TextInputAction.done,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -177,20 +124,13 @@ class _AddNoteState extends State<AddNote> {
 
   Future updateNote() async {
     final note = widget.note!.copy(
-        title: title,
-        body: body,
-        creationDate:
-            DateFormat.yMMMMEEEEd(DateTime.now()).add_jm().toString());
-
+        title: title, body: body, creationDate: DateTime.now().toString());
     await SecureNotesDB.instance.update(note);
   }
 
   Future addNote() async {
     final note = NoteModel(
-        title: title,
-        body: body,
-        creationDate:
-            DateFormat.yMMMMEEEEd(DateTime.now()).add_jm().toString());
+        title: title!, body: body!, creationDate: DateTime.now().toString());
 
     await SecureNotesDB.instance.create(note);
   }

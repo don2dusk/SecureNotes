@@ -3,10 +3,10 @@ final String tableNotes = 'notes';
 class NoteFields {
   static final List<String> values = [id, title, body, creationDate];
 
-  static final String id = '_id';
-  static final String title = 'Title';
-  static final String body = 'Body';
-  static final String creationDate = 'Creation Date';
+  static final String id = 'id';
+  static final String title = 'title';
+  static final String body = 'body';
+  static final String creationDate = 'creationDate';
 }
 
 class NoteModel {

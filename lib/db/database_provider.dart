@@ -22,12 +22,13 @@ class SecureNotesDB {
   }
 
   Future _createDB(Database db, int version) async {
-    await db.execute('''
+    await db.execute(
+        '''
       CREATE TABLE $tableNotes(
         ${NoteFields.id} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${NoteFields.title} TEXT NOT NULL,
         ${NoteFields.body} TEXT NOT NULL,
-        ${NoteFields.creationDate} TEXT NOT NULL,
+        ${NoteFields.creationDate} TEXT NOT NULL
         )
 ''');
   }
@@ -67,9 +68,7 @@ class SecureNotesDB {
 
   Future<List<NoteModel>> readAllNotes() async {
     final db = await instance.database;
-
-    final orderBy = '${NoteFields.creationDate} ASC';
-    final result = await db.query(tableNotes, orderBy: orderBy);
+    final result = await db.query(tableNotes);
 
     return result.map((json) => NoteModel.fromJson(json)).toList();
   }
@@ -93,7 +92,7 @@ class SecureNotesDB {
 
   Future close() async {
     final db = await instance.database;
-
-    db.close();
+    _database = null;
+    return db.close();
   }
 }

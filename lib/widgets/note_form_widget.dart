@@ -1,51 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:secure_notes/screens/add_note.dart';
 
 class NoteFormWidget extends StatelessWidget {
-  final bool? isImportant;
-  final int? number;
   final String? title;
-  final String? description;
-  final ValueChanged<bool> onChangedImportant;
-  final ValueChanged<int> onChangedNumber;
+  final String? body;
   final ValueChanged<String> onChangedTitle;
-  final ValueChanged<String> onChangedDescription;
+  final ValueChanged<String> onChangedBody;
 
   const NoteFormWidget({
     Key? key,
-    this.isImportant = false,
-    this.number = 0,
     this.title = '',
-    this.description = '',
-    required this.onChangedImportant,
-    required this.onChangedNumber,
+    this.body = '',
     required this.onChangedTitle,
-    required this.onChangedDescription,
+    required this.onChangedBody,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16),
+  Widget build(BuildContext context) => Padding(
+        padding: EdgeInsets.all(16),
+        child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  Switch(
-                    value: isImportant ?? false,
-                    onChanged: onChangedImportant,
-                  ),
-                  Expanded(
-                    child: Slider(
-                      value: (number ?? 0).toDouble(),
-                      min: 0,
-                      max: 5,
-                      divisions: 5,
-                      onChanged: (number) => onChangedNumber(number.toInt()),
-                    ),
-                  )
-                ],
-              ),
               buildTitle(),
               SizedBox(height: 8),
               buildDescription(),
@@ -59,32 +35,28 @@ class NoteFormWidget extends StatelessWidget {
         maxLines: 1,
         initialValue: title,
         style: TextStyle(
-          color: Colors.white70,
+          color: Colors.black,
           fontWeight: FontWeight.bold,
           fontSize: 24,
         ),
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Title',
-          hintStyle: TextStyle(color: Colors.white70),
-        ),
+        decoration:
+            InputDecoration(border: InputBorder.none, hintText: 'Title'),
         validator: (title) =>
             title != null && title.isEmpty ? 'The title cannot be empty' : null,
         onChanged: onChangedTitle,
       );
 
-  Widget buildDescription() => TextFormField(
-        maxLines: 5,
-        initialValue: description,
-        style: TextStyle(color: Colors.white60, fontSize: 18),
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: 'Type something...',
-          hintStyle: TextStyle(color: Colors.white60),
+  Widget buildDescription() => SingleChildScrollView(
+        child: TextFormField(
+          initialValue: body,
+          style: TextStyle(color: Colors.black, fontSize: 18),
+          decoration: InputDecoration(
+              border: InputBorder.none, hintText: 'Type something...'),
+          validator: (title) => title != null && title.isEmpty
+              ? 'The description cannot be empty'
+              : null,
+          onChanged: onChangedBody,
+          maxLines: 25,
         ),
-        validator: (title) => title != null && title.isEmpty
-            ? 'The description cannot be empty'
-            : null,
-        onChanged: onChangedDescription,
       );
 }
