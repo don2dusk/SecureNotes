@@ -52,8 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userName =
-        'Otega'; //ModalRoute.of(context)!.settings.arguments as String;
+    final userName = ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
