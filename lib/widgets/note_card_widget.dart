@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:secure_notes/db/database_provider.dart';
 import 'package:secure_notes/model/note_model.dart';
 
 final _lightColors = [
@@ -27,31 +29,30 @@ class NoteCardWidget extends StatelessWidget {
     final minHeight = getMinHeight(index);
 
     return Card(
-      color: color,
-      child: Container(
-        constraints: BoxConstraints(minHeight: minHeight),
-        padding: EdgeInsets.all(8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 4),
-            Text(
-              note.title,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+        color: color,
+        child: Container(
+          constraints: BoxConstraints(minHeight: minHeight),
+          padding: EdgeInsets.all(8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 4),
+              Text(
+                note.title,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(
-              height: 4,
-            ),
-            Text(note.body)
-          ],
-        ),
-      ),
-    );
+              SizedBox(
+                height: 4,
+              ),
+              Text(note.body)
+            ],
+          ),
+        ));
   }
 
   /// To return different height for different widgets
@@ -68,5 +69,9 @@ class NoteCardWidget extends StatelessWidget {
       default:
         return 100;
     }
+  }
+
+  Future deleteNotes() async {
+    await SecureNotesDB.instance.delete(index);
   }
 }

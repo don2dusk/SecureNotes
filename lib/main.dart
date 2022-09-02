@@ -14,7 +14,7 @@ void main() {
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    color: Colors.black,
+    color: Colors.white,
     home: WelcomeScreen(),
   ));
 }

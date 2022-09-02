@@ -22,8 +22,7 @@ class SecureNotesDB {
   }
 
   Future _createDB(Database db, int version) async {
-    await db.execute(
-        '''
+    await db.execute('''
       CREATE TABLE $tableNotes(
         ${NoteFields.id} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${NoteFields.title} TEXT NOT NULL,
